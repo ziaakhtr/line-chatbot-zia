@@ -7,9 +7,9 @@ import os
 app = Flask(__name__)
 
 # Load environment variables
-LINE_CHANNEL_ACCESS_TOKEN = os.environ["yqjmLD+Lq/i9EXReshBEmTMbq+OYcPpp7db0/ho3NQLy2LSIIuxZutR2LyJnUssqMN44MwBPUD5e/ANHxZQN1on5IkuvQKpoooUeucFaTUnSyYUcwglBY6CpAaIvqwbz/m0EaaMo++Waec3BcMxZ0wdB04t89/1O/w1cDnyilFU="]
-LINE_CHANNEL_SECRET = os.environ["6c1a8229743de99066052807fd7851d5"]
-HF_API_TOKEN = os.environ["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"]
+LINE_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
+LINE_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
+HF_API_TOKEN = os.environ["HF_API_TOKEN"]
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
@@ -57,3 +57,4 @@ def handle_message(event):
         event.reply_token,
         TextSendMessage(text=reply_text)
     )
+
