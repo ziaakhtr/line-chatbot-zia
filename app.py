@@ -33,7 +33,7 @@ def handle_message(event):
     user_input = event.message.text
     print("Received message:", user_input)
 
-    HF_MODEL_ID = "mistralai/Mistral-7B-Instruct-v0.1"
+    HF_MODEL_ID = "google/flan-t5-small"
     HF_API_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL_ID}"
     headers = {
         "Authorization": f"Bearer {HF_API_TOKEN}"
@@ -62,4 +62,5 @@ def handle_message(event):
         event.reply_token,
         TextSendMessage(text=reply_text)
     )
+
 
