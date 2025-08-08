@@ -7,18 +7,17 @@ import os
 app = Flask(__name__)
 
 # Load environment variables
-LINE_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
-LINE_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
-HF_API_TOKEN = os.environ["HF_API_TOKEN"]
+LINE_CHANNEL_ACCESS_TOKEN = os.getenv[LINE_CHANNEL_ACCESS_TOKEN]
+LINE_CHANNEL_SECRET = os.environ[LINE_CHANNEL_SECRET]
+HELPINGAI_API_KEY = os.environ[HELPINGAI_API_KEY]
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
 @app.route("/callback", methods=['POST'])
 def callback():
-    signature = request.headers.get('X-Line-Signature', '')
+    signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
-    print("Request body:", body)  # Log the incoming webhook
 
     try:
         handler.handle(body, signature)
@@ -31,36 +30,40 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_input = event.message.text
-    print("Received message:", user_input)
 
-    HF_MODEL_ID = "google/flan-t5-small"
-    HF_API_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL_ID}"
+    # Call Helping AI API
     headers = {
-        "Authorization": f"Bearer {HF_API_TOKEN}"
+        "Authorization": f"Bearer {HELPINGAI_API_KEY}",
+        "Content-Type": "application/json"
     }
 
-    prompt = f"User: {user_input}\nBot:"
+    payload = {
+        "model": "gpt-3.5-turbo",  # or whatever model HelpingAI provides
+        "messages": [
+            {"role": "user", "content": user_input}
+        ]
+    }
+
     try:
         response = requests.post(
-            HF_API_URL,
+            "https://api.helping.ai/v1/chat/completions",  # Replace with actual endpoint from Helping AI
             headers=headers,
-            json={"inputs": prompt}
+            json=payload
         )
-        print("HF response:", response.text)
 
         if response.status_code == 200:
-            result = response.json()
-            reply_text = result[0]["generated_text"].split("Bot:")[-1].strip()
+            data = response.json()
+            reply_text = data["choices"][0]["message"]["content"]
         else:
-            reply_text = "🤖 Bot error: HF status code " + str(response.status_code)
+            print("HelpingAI API error:", response.status_code, response.text)
+            reply_text = "Sorry, the bot is not available right now."
 
     except Exception as e:
-        reply_text = "🤖 Bot crashed. Check logs."
-        print("Error in HF request:", e)
+        print("API call failed:", e)
+        reply_text = "Error connecting to AI service."
 
+    # Reply via LINE
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=reply_text)
+        TextSendMessage(text=reply_text.strip())
     )
-
-
