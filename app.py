@@ -7,9 +7,9 @@ import os
 app = Flask(__name__)
 
 # Load environment variables
-LINE_CHANNEL_ACCESS_TOKEN = os.getenv[LINE_CHANNEL_ACCESS_TOKEN]
-LINE_CHANNEL_SECRET = os.environ[LINE_CHANNEL_SECRET]
-HELPINGAI_API_KEY = os.environ[HELPINGAI_API_KEY]
+LINE_CHANNEL_ACCESS_TOKEN = os.getenv["LINE_CHANNEL_ACCESS_TOKEN"]
+LINE_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
+HELPINGAI_API_KEY = os.environ["HELPINGAI_API_KEY"]
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
@@ -67,3 +67,4 @@ def handle_message(event):
         event.reply_token,
         TextSendMessage(text=reply_text.strip())
     )
+
